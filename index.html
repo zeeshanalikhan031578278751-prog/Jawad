@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Restaurant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --blue: #1d4ed8;
+      --blue-dark: #1e3a8a;
+      --blue-light: #e0f2fe;
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --radius-lg: 18px;
+      --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== HEADER (اب سٹکی) ===== */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+      color: #ffffff;
+      padding: 18px 16px 14px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .brand-name {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .brand-tagline {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .today-sales {
+      font-size: 13px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.35);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      backdrop-filter: blur(6px);
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.3);
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .search-box {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.22);
+      border-radius: 999px;
+      padding: 7px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.4);
+    }
+
+    .search-icon {
+      width: 15px;
+      height: 15px;
+      border-radius: 999px;
+      border: 2px solid rgba(226, 232, 240, 0.9);
+      position: relative;
+    }
+
+    .search-icon::after {
+      content: "";
+      width: 7px;
+      height: 2px;
+      border-radius: 999px;
+      background: rgba(226, 232, 240, 0.9);
+      position: absolute;
+      right: -4px;
+      bottom: -1px;
+      transform: rotate(40deg);
+    }
+
+    #searchInput {
+      border: none;
+      outline: none;
+      background: transparent;
+      color: #e5e7eb;
+      font-size: 13px;
+      width: 100%;
+    }
+
+    #searchInput::placeholder {
+      color: rgba(229, 231, 235, 0.8);
+    }
+
+    main {
+      flex: 1;
+      padding: 16px;
+    }
+
+    .content {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      margin-bottom: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--blue-dark);
+    }
+
+    /* ===== MENU CARDS ===== */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.14s ease, box-shadow 0.14s ease, translate 0.14s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 18px 32px rgba(15, 23, 42, 0.2);
+    }
+
+    .card-img-wrapper {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      background: #e5e7eb;
+    }
+
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.25s ease;
+    }
+
+    .card:hover .card-img {
+      transform: scale(1.08);
+    }
+
+    .card-body {
+      padding: 8px 10px 10px;
+      background: radial-gradient(circle at top left, #eef2ff, #ffffff);
+    }
+
+    .card-name {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .card-price {
+      font-size: 13px;
+      color: var(--blue-dark);
+      font-weight: 700;
+    }
+
+    .card-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .no-results {
+      padding: 30px 8px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* ===== MODAL (بڑی تصویر + اینیمیشن) ===== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+
+    .modal-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: transparent;
+      border-radius: 24px;
+      max-width: 420px;
+      width: 100%;
+      overflow: visible;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(20px) scale(0.96);
+      opacity: 0;
+      transition: transform 0.22s ease, opacity 0.22s ease;
+    }
+
+    .modal-backdrop.show .modal {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .modal-img-wrapper {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: #e5e7eb;
+      overflow: hidden;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .modal-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transform: scale(1.02);
+    }
+
+    /* یہ وہ سفید بلوک تھا – اب soft blue/glass style */
+    .modal-body {
+      position: relative;
+      margin: -22px 10px 0;
+      padding: 14px 16px 10px;
+      background: linear-gradient(135deg, rgba(248, 250, 252, 0.98), rgba(219, 234, 254, 0.98));
+      border-radius: 18px;
+      box-shadow: 0 15px 35px rgba(15, 23, 42, 0.45);
+    }
+
+    .modal-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .modal-name {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .modal-price {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--blue-dark);
+    }
+
+    .modal-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn {
+      border: none;
+      outline: none;
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.45);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.6);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--blue-dark);
+      border: 1px solid #d1d5db;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: #6b7280;
+    }
+
+    /* ===== ADMIN PANEL (زیادہ سٹائل + slide) ===== */
+    .admin-panel {
+      position: fixed;
+      inset: 0 auto 0 0;
+      max-width: 380px;
+      width: 100%;
+      background: radial-gradient(circle at top left, #e0f2fe, #f9fafb);
+      border-right: 1px solid #e5e7eb;
+      box-shadow: 12px 0 30px rgba(15, 23, 42, 0.35);
+      transform: translateX(-105%);
+      transition: transform 0.26s ease-out;
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .admin-panel.open {
+      transform: translateX(0);
+    }
+
+    .admin-header {
+      padding: 12px 14px 8px;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.7);
+    }
+
+    .admin-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .admin-pin {
+      font-size: 11px;
+      opacity: 0.8;
+    }
+
+    .admin-body {
+      padding: 10px 14px 14px;
+      overflow-y: auto;
+      font-size: 13px;
+    }
+
+    .admin-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin: 10px 0 4px;
+      color: var(--blue-dark);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .field-group {
+      margin-bottom: 6px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 2px;
+      color: #374151;
+    }
+
+    .field-input {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      padding: 6px 8px;
+      font-size: 12px;
+      outline: none;
+      background: #ffffff;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    }
+
+    .field-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.25);
+    }
+
+    .items-list {
+      margin-top: 6px;
+      border-radius: 12px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    .items-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 8px;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 12px;
+    }
+
+    .items-row:last-child {
+      border-bottom: none;
+    }
+
+    .items-row-name {
+      font-weight: 500;
+    }
+
+    .items-row-price {
+      color: var(--blue-dark);
+      margin-left: 6px;
+    }
+
+    .items-row-actions {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      background: var(--blue-light);
+      color: var(--blue-dark);
+    }
+
+    .admin-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    footer {
+      padding: 10px 14px 16px;
+      font-size: 11px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    /* ===== گھومتے ٹائر/گیئر ===== */
+    .gear-strip {
+      position: fixed;
+      right: 10px;
+      bottom: 80px;
+      z-index: 35;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .gear {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #f9fafb, #c7d2fe);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.35);
+      font-size: 15px;
+      animation: spin 6s linear infinite;
+      backdrop-filter: blur(4px);
+    }
+
+    .gear:nth-child(2) {
+      animation-duration: 9s;
+      opacity: 0.9;
+    }
+
+    .gear:nth-child(3) {
+      animation-duration: 12s;
+      opacity: 0.8;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 720px) {
+      main {
+        padding: 14px 10px 18px;
+      }
+
+      header {
+        padding-inline: 12px;
+      }
+
+      .admin-panel {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="header-inner">
+        <div class="brand-row">
+          <div>
+            <div class="brand-name">Blue Sky Restaurant</div>
+            <div class="brand-tagline">Fresh · Fast · Tasty · Halal</div>
+          </div>
+          <div class="today-sales" id="todaySalesBadge">
+            <span class="badge-dot"></span>
+            <span>Today: £0.00</span>
+          </div>
+        </div>
+
+        <div class="search-row">
+          <div class="search-box">
+            <div class="search-icon"></div>
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Search menu… (Admin PIN: 2004)"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="content">
+        <h2 class="section-title">Menu</h2>
+        <div id="menuGrid" class="menu-grid"></div>
+        <div id="noResults" class="no-results" style="display: none;">
+          کوئی آئٹم نہیں ملا۔ نام سے سرچ کریں، یا ایڈمن موڈ میں نیا آئٹم add کریں۔
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      © <span id="year"></span> Blue Sky Restaurant · Simple one-page menu · UK
+    </footer>
+  </div>
+
+  <!-- Item detail modal -->
+  <div id="itemModalBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-img-wrapper">
+        <img id="modalImg" class="modal-img" src="" alt="" />
+      </div>
+      <div class="modal-body">
+        <div class="modal-title-row">
+          <div class="modal-name" id="modalName">Item name</div>
+          <div class="modal-price" id="modalPrice">£0.00</div>
+        </div>
+        <div class="modal-desc" id="modalDesc">
+          Description here...
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" id="modalCloseBtn">Close</button>
+          <button class="btn btn-primary" id="modalOrderBtn">
+            Order now (WhatsApp)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin panel -->
+  <aside id="adminPanel" class="admin-panel">
+    <div class="admin-header">
+      <div>
+        <div class="admin-title">Admin Panel</div>
+        <div class="admin-pin">Unlocked with PIN: 2004</div>
+      </div>
+      <button class="btn btn-ghost" id="adminCloseBtn">Close</button>
+    </div>
+    <div class="admin-body">
+      <div class="admin-section-title">
+        <span>Today's Sales</span>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="todaySalesInput">
+          Enter total for today (£)
+        </label>
+        <input
+          id="todaySalesInput"
+          type="number"
+          min="0"
+          step="0.01"
+          class="field-input"
+          placeholder="مثلاً 250.50"
+        />
+      </div>
+      <button class="btn btn-primary" id="saveSalesBtn">Save today total</button>
+      <div class="admin-note">
+        نوٹ: یہ صرف <strong>آپ کے اس براوزر</strong> میں محفوظ ہوگا (localStorage)۔  
+        اصل آٹومیٹک حساب کے لیے بعد میں Stripe / PayPal جوڑیں گے۔
+      </div>
+
+      <div class="admin-section-title">
+        <span>Add new item</span>
+      </div>
+      <form id="addItemForm">
+        <div class="field-group">
+          <label class="field-label" for="itemNameInput">Name</label>
+          <input
+            id="itemNameInput"
+            type="text"
+            class="field-input"
+            placeholder="مثلاً Chicken Burger"
+            required
+          />
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="itemPriceInput">Price (£)</label>
+          <input
+            id="itemPriceInput"
+            type="number"
+            step="0.01"
+            min="0"
+            class="field-input"
+            placeholder="مثلاً 5.99"
+            required
+          />
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="itemImgInput">
+            Image URL (سرور /images/burger.jpg وغیرہ)
+          </label>
+          <input
+            id="itemImgInput"
+            type="text"
+            class="field-input"
+            placeholder="https://example.com/image.jpg یا /images/burger.jpg"
+            required
+          />
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="itemDescInput">Short description (optional)</label>
+          <input
+            id="itemDescInput"
+            type="text"
+            class="field-input"
+            placeholder="مثلاً Spicy grilled chicken burger"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 4px;">
+          Add item
+        </button>
+        <div class="admin-note">
+          اصل فوٹو آپ FTP یا cPanel سے upload کریں،  
+          اور یہاں اس کا path / URL لکھیں۔
+        </div>
+      </form>
+
+      <div class="admin-section-title">
+        <span>All items</span>
+        <span class="pill"><span>●</span><span>Image = change photo</span></span>
+      </div>
+      <div id="itemsList" class="items-list"></div>
+    </div>
+  </aside>
+
+  <!-- تصویر بدلنے کے لیے hidden input -->
+  <input type="file" id="changeImageInput" accept="image/*" style="display:none;" />
+
+  <!-- دائیں طرف گھومتے گیئر -->
+  <div class="gear-strip">
+    <div class="gear">⚙️</div>
+    <div class="gear">⚙️</div>
+    <div class="gear">⚙️</div>
+  </div>
+
+  <script>
+    const ADMIN_PIN = "2004";
+    const STORAGE_KEY_ITEMS = "restaurant_menu_items_v1";
+    const STORAGE_KEY_SALES = "restaurant_today_sales";
+
+    const defaultItems = [
+      { id: 1, name: "Chicken Burger", price: 5.99, img: "https://via.placeholder.com/400x300?text=Chicken+Burger", desc: "Crispy chicken burger with lettuce & sauce." },
+      { id: 2, name: "Beef Burger", price: 6.50, img: "https://via.placeholder.com/400x300?text=Beef+Burger", desc: "Juicy beef patty with cheese." },
+      { id: 3, name: "Margherita Pizza", price: 8.99, img: "https://via.placeholder.com/400x300?text=Margherita+Pizza", desc: "Classic cheese & tomato pizza." },
+      { id: 4, name: "Pepperoni Pizza", price: 9.50, img: "https://via.placeholder.com/400x300?text=Pepperoni+Pizza", desc: "Spicy pepperoni with mozzarella." },
+      { id: 5, name: "Chicken Biryani", price: 7.99, img: "https://via.placeholder.com/400x300?text=Chicken+Biryani", desc: "Spiced rice with tender chicken." },
+      { id: 6, name: "Lamb Karahi", price: 10.99, img: "https://via.placeholder.com/400x300?text=Lamb+Karahi", desc: "Rich lamb curry with spices." },
+      { id: 7, name: "Grilled Chicken", price: 9.25, img: "https://via.placeholder.com/400x300?text=Grilled+Chicken", desc: "Charcoal grilled chicken." },
+      { id: 8, name: "Shish Kebab", price: 6.99, img: "https://via.placeholder.com/400x300?text=Shish+Kebab", desc: "Tender kebabs with salad." },
+      { id: 9, name: "Mixed Grill", price: 12.50, img: "https://via.placeholder.com/400x300?text=Mixed+Grill", desc: "Selection of grilled meats." },
+      { id: 10, name: "Chicken Wrap", price: 5.50, img: "https://via.placeholder.com/400x300?text=Chicken+Wrap", desc: "Chicken wrap with sauce." },
+      { id: 11, name: "Veggie Wrap", price: 4.99, img: "https://via.placeholder.com/400x300?text=Veggie+Wrap", desc: "Fresh vegetables & hummus." },
+      { id: 12, name: "Falafel Plate", price: 6.20, img: "https://via.placeholder.com/400x300?text=Falafel+Plate", desc: "Falafel with salad & dips." },
+      { id: 13, name: "Chicken Wings", price: 5.99, img: "https://via.placeholder.com/400x300?text=Chicken+Wings", desc: "Crispy wings with sauce." },
+      { id: 14, name: "Fish & Chips", price: 7.50, img: "https://via.placeholder.com/400x300?text=Fish+%26+Chips", desc: "Golden fried fish & chips." },
+      { id: 15, name: "Cheesy Fries", price: 3.50, img: "https://via.placeholder.com/400x300?text=Cheesy+Fries", desc: "Fries loaded with cheese." },
+      { id: 16, name: "Salad Bowl", price: 4.50, img: "https://via.placeholder.com/400x300?text=Salad+Bowl", desc: "Fresh mixed salad." },
+      { id: 17, name: "Tandoori Naan", price: 1.50, img: "https://via.placeholder.com/400x300?text=Tandoori+Naan", desc: "Soft tandoori naan." },
+      { id: 18, name: "Garlic Bread", price: 2.20, img: "https://via.placeholder.com/400x300?text=Garlic+Bread", desc: "Garlic butter bread." },
+      { id: 19, name: "Mango Lassi", price: 2.99, img: "https://via.placeholder.com/400x300?text=Mango+Lassi", desc: "Sweet mango yogurt drink." },
+      { id: 20, name: "Soft Drink Can", price: 1.20, img: "https://via.placeholder.com/400x300?text=Soft+Drink", desc: "Cold canned drink." }
+    ];
+
+    function loadItems() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_ITEMS);
+        if (!raw) return [...defaultItems];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed) || !parsed.length) return [...defaultItems];
+        return parsed;
+      } catch (e) {
+        console.warn("Failed to load items from localStorage", e);
+        return [...defaultItems];
+      }
+    }
+
+    function saveItems() {
+      try {
+        localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(items));
+      } catch (e) {
+        console.warn("Failed to save items", e);
+      }
+    }
+
+    function loadTodaySales() {
+      const raw = localStorage.getItem(STORAGE_KEY_SALES);
+      const val = parseFloat(raw);
+      if (isNaN(val)) return 0;
+      return val;
+    }
+
+    function saveTodaySales(val) {
+      localStorage.setItem(STORAGE_KEY_SALES, String(val));
+    }
+
+    let items = loadItems();
+    let filteredItems = [...items];
+    let adminOpen = false;
+    let currentImageChangeItemId = null;
+
+    const menuGrid = document.getElementById("menuGrid");
+    const noResultsEl = document.getElementById("noResults");
+    const itemModalBackdrop = document.getElementById("itemModalBackdrop");
+    const modalImg = document.getElementById("modalImg");
+    const modalName = document.getElementById("modalName");
+    const modalPrice = document.getElementById("modalPrice");
+    const modalDesc = document.getElementById("modalDesc");
+    const modalCloseBtn = document.getElementById("modalCloseBtn");
+    const modalOrderBtn = document.getElementById("modalOrderBtn");
+    const searchInput = document.getElementById("searchInput");
+    const adminPanel = document.getElementById("adminPanel");
+    const adminCloseBtn = document.getElementById("adminCloseBtn");
+    const itemsList = document.getElementById("itemsList");
+    const todaySalesInput = document.getElementById("todaySalesInput");
+    const todaySalesBadge = document.getElementById("todaySalesBadge");
+    const saveSalesBtn = document.getElementById("saveSalesBtn");
+    const addItemForm = document.getElementById("addItemForm");
+    const itemNameInput = document.getElementById("itemNameInput");
+    const itemPriceInput = document.getElementById("itemPriceInput");
+    const itemImgInput = document.getElementById("itemImgInput");
+    const itemDescInput = document.getElementById("itemDescInput");
+    const changeImageInput = document.getElementById("changeImageInput");
+    const yearEl = document.getElementById("year");
+    yearEl.textContent = new Date().getFullYear();
+
+    function formatPrice(p) {
+      const num = Number(p);
+      if (isNaN(num)) return "£0.00";
+      return "£" + num.toFixed(2);
+    }
+
+    function renderMenu(list) {
+      menuGrid.innerHTML = "";
+      if (!list.length) {
+        noResultsEl.style.display = "block";
+        return;
+      }
+      noResultsEl.style.display = "none";
+
+      list.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.id = item.id;
+
+        card.innerHTML = `
+          <div class="card-img-wrapper">
+            <img src="${item.img}" alt="${item.name}" class="card-img" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image';" />
+          </div>
+          <div class="card-body">
+            <div class="card-name">${item.name}</div>
+            <div class="card-price">${formatPrice(item.price)}</div>
+            ${item.desc ? `<div class="card-desc">${item.desc}</div>` : ""}
+          </div>
+        `;
+
+        card.addEventListener("click", () => openItemModal(item.id));
+        menuGrid.appendChild(card);
+      });
+    }
+
+    function openItemModal(itemId) {
+      const item = items.find((it) => String(it.id) === String(itemId));
+      if (!item) return;
+      modalImg.src = item.img;
+      modalImg.alt = item.name;
+      modalName.textContent = item.name;
+      modalPrice.textContent = formatPrice(item.price);
+      modalDesc.textContent = item.desc || "Delicious fresh item from our kitchen.";
+      itemModalBackdrop.classList.add("show");
+
+      modalOrderBtn.onclick = () => {
+        const msg = encodeURIComponent(
+          `Salam, I would like to order: ${item.name} (${formatPrice(
+            item.price
+          )})`
+        );
+        // اپنا WhatsApp نمبر یہاں:
+        const phone = "447000000000";
+        const url = `https://wa.me/${phone}?text=${msg}`;
+        window.open(url, "_blank");
+      };
+    }
+
+    function closeItemModal() {
+      itemModalBackdrop.classList.remove("show");
+    }
+
+    function openAdminPanel() {
+      adminOpen = true;
+      adminPanel.classList.add("open");
+      searchInput.value = "";
+      renderItemsList();
+      const today = loadTodaySales();
+      todaySalesInput.value = today ? today.toFixed(2) : "";
+    }
+
+    function closeAdminPanel() {
+      adminOpen = false;
+      adminPanel.classList.remove("open");
+    }
+
+    function renderItemsList() {
+      itemsList.innerHTML = "";
+      if (!items.length) {
+        itemsList.innerHTML =
+          '<div class="items-row"><span>No items yet.</span></div>';
+        return;
+      }
+
+      items.forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "items-row";
+        row.innerHTML = `
+          <div>
+            <span class="items-row-name">${item.name}</span>
+            <span class="items-row-price">${formatPrice(item.price)}</span>
+          </div>
+          <div class="items-row-actions">
+            <button class="btn btn-outline btn-xs" data-image="${item.id}" style="padding:2px 8px;font-size:11px;">
+              Image
+            </button>
+            <button class="btn btn-outline btn-xs" data-delete="${item.id}" style="padding:2px 8px;font-size:11px;">
+              Delete
+            </button>
+          </div>
+        `;
+        itemsList.appendChild(row);
+      });
+
+      itemsList.querySelectorAll("[data-delete]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-delete");
+          if (confirm("کیا آپ واقعی یہ آئٹم delete کرنا چاہتے ہیں؟")) {
+            items = items.filter((it) => String(it.id) !== String(id));
+            saveItems();
+            filteredItems = [...items];
+            renderItemsList();
+            renderMenu(filteredItems);
+          }
+        });
+      });
+
+      itemsList.querySelectorAll("[data-image]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-image");
+          currentImageChangeItemId = id;
+          changeImageInput.click();
+        });
+      });
+    }
+
+    function updateTodaySalesBadge() {
+      const val = loadTodaySales();
+      const span = todaySalesBadge.querySelector("span:last-child");
+      span.textContent = "Today: " + formatPrice(val);
+    }
+
+    searchInput.addEventListener("input", (e) => {
+      const value = e.target.value.trim();
+      if (value === ADMIN_PIN && !adminOpen) {
+        openAdminPanel();
+        return;
+      }
+
+      const term = value.toLowerCase();
+      if (!term) {
+        filteredItems = [...items];
+      } else {
+        filteredItems = items.filter((it) =>
+          it.name.toLowerCase().includes(term)
+        );
+      }
+      renderMenu(filteredItems);
+    });
+
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const value = searchInput.value.trim();
+        if (value === ADMIN_PIN && !adminOpen) {
+          e.preventDefault();
+          openAdminPanel();
+        }
+      }
+    });
+
+    itemModalBackdrop.addEventListener("click", (e) => {
+      if (e.target === itemModalBackdrop) {
+        closeItemModal();
+      }
+    });
+    modalCloseBtn.addEventListener("click", closeItemModal);
+    adminCloseBtn.addEventListener("click", closeAdminPanel);
+
+    saveSalesBtn.addEventListener("click", () => {
+      const raw = todaySalesInput.value.trim();
+      const num = parseFloat(raw);
+      if (isNaN(num) || num < 0) {
+        alert("براہ کرم درست رقم لکھیں (0 سے زیادہ)");
+        return;
+      }
+      saveTodaySales(num);
+      updateTodaySalesBadge();
+      alert("Today's total saved!");
+    });
+
+    addItemForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = itemNameInput.value.trim();
+      const price = parseFloat(itemPriceInput.value);
+      const img = itemImgInput.value.trim();
+      const desc = itemDescInput.value.trim();
+
+      if (!name || isNaN(price) || price < 0 || !img) {
+        alert("براہ کرم نام، قیمت اور تصویر کا URL صحیح لکھیں۔");
+        return;
+      }
+
+      const maxId = items.reduce((max, it) => (it.id > max ? it.id : max), 0);
+      const newItem = {
+        id: maxId + 1,
+        name,
+        price,
+        img,
+        desc
+      };
+      items.push(newItem);
+      saveItems();
+      filteredItems = [...items];
+      renderItemsList();
+      renderMenu(filteredItems);
+
+      addItemForm.reset();
+      alert("نیا آئٹم add ہو گیا!");
+    });
+
+    changeImageInput.addEventListener("change", (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file || !currentImageChangeItemId) {
+        changeImageInput.value = "";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const dataUrl = ev.target.result;
+        const item = items.find(
+          (it) => String(it.id) === String(currentImageChangeItemId)
+        );
+        if (item) {
+          item.img = dataUrl;
+          saveItems();
+          filteredItems = [...items];
+          renderItemsList();
+          renderMenu(filteredItems);
+          alert("تصویر اپڈیٹ ہو گئی!");
+        }
+        currentImageChangeItemId = null;
+        changeImageInput.value = "";
+      };
+      reader.readAsDataURL(file);
+    });
+
+    filteredItems = [...items];
+    renderMenu(filteredItems);
+    updateTodaySalesBadge();
+  </script>
+</body>
+</html>
