@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فش اینڈ چپس | پریمیم مینیو</title>
+    
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding-bottom: 70px; /* کارٹ بار کے لیے جگہ */
+            text-align: right;
+        }
+
+        .header {
+            background-color: #c0392b; /* سرخ رنگ */
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+        }
+
+        .header h1 { margin: 0; font-size: 24px; }
+        .header p { margin: 5px 0 0; font-size: 14px; }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            text-align: right;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .menu-item {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+            min-height: 150px;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .item-content {
+            padding: 15px;
+            padding-bottom: 50px; /* بٹن کے لیے جگہ */
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+        }
+
+        .item-header h3 { margin: 0; font-size: 18px; }
+        .item-price {
+            color: #c0392b;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .item-description { font-size: 14px; color: #666; margin-top: 5px; }
+
+        .add-to-cart-btn {
+            background-color: #c0392b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            position: absolute;
+            bottom: 15px;
+            left: 15px; /* دائیں سے بائیں ترتیب میں دائیں طرف */
+            transition: background-color 0.2s;
+        }
+
+        .add-to-cart-btn:hover { background-color: #a93226; }
+
+        /* کارٹ سمری بار */
+        .cart-summary {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .cart-summary button {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* ماڈل/پاپ اپ کے لیے اسٹائل */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 200;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.7);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            text-align: right;
+            position: relative;
+        }
+
+        .modal-options div {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-options input[type="radio"] {
+            margin-left: 10px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .modal-footer button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            flex-grow: 1;
+            margin: 0 5px;
+        }
+
+        .modal-close-btn { background-color: #95a5a6; color: white; }
+        .modal-add-btn { background-color: #27ae60; color: white; }
+        
+        /* ایڈمن پینل اسٹائلز */
+        #admin-panel {
+            background-color: #34495e;
+            color: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            display: none; /* ابتدائی طور پر چھپا ہوا */
+            position: fixed;
+            z-index: 300;
+            width: 90%;
+            max-width: 600px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        
+        .admin-form-group input, .admin-form-group button { margin-top: 10px; }
+    </style>
+    </head>
+<body>
+
+    <header class="header">
+        <h1>فش اینڈ چپس | پریمیم مینیو</h1>
+        <p>فریش • فاسٹ • ٹیسٹی • حلال</p>
+        <p style="font-size: 16px; margin-top: 10px; font-weight: bold;" id="delivery-status">ڈیلیوری اور کلیکشن دستیاب ہے</p>
+    </header>
+
+    <div class="container">
+        <input type="text" id="menu-search" class="search-bar" placeholder="مینیو میں سرچ کریں یا ایڈمن کے لیے 2004 ٹائپ کریں...">
+
+        <div class="menu-grid" id="menu-container">
+            </div>
+
+    </div> <div id="item-options-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-item-name"></h3>
+            <p style="color: #c0392b;">آپشن منتخب کریں</p>
+            
+            <div class="modal-options" id="modal-options-list">
+                </div>
+
+            <div class="modal-footer">
+                <button onclick="closeModal()" class="modal-close-btn">بند کریں</button>
+                <button onclick="addToCart(currentSelectedItem, currentSelectedItem.options.find(opt => opt.name === document.querySelector('input[name=\"item-option\"]:checked').value))" class="modal-add-btn">کارٹ میں شامل کریں</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-panel">
+        <h2>🔐 ایڈمن پینل</h2>
+        <div class="admin-form-group">
+            <label>آج کی کل سیلز (£)</label>
+            <input type="number" id="today-sales-input" value="0.00">
+            <button class="admin-btn" onclick="saveSales()">سیلز محفوظ کریں</button>
+        </div>
+        
+        <hr>
+
+        <div class="admin-form-group">
+            <label>ڈیلیوری چارج (£)</label>
+            <input type="number" id="delivery-charge-input" value="3.00">
+            <label><input type="checkbox" id="delivery-available-checkbox" checked> ڈیلیوری آج دستیاب ہے</label>
+            <button class="admin-btn" onclick="saveDeliverySettings()">ڈیلیوری سیٹنگز محفوظ کریں</button>
+        </div>
+
+        <button onclick="closeAdminPanel()" class="admin-btn" style="background-color: #7f8c8d; float: left;">بند کریں</button>
+    </div>
+
+
+    <div class="cart-summary" id="cart-bar">
+        <span>🛒 آپ کا آرڈر: <span id="cart-item-count">0 آئٹمز</span> - <span id="cart-total">£0.00</span></span>
+        <button onclick="viewCart()">آرڈر دیکھیں</button>
+    </div>
+
+    <script>
+        // ڈیٹا اسٹوریج (صرف براؤزر کی لوکل اسٹوریج میں)
+        let cart = JSON.parse(localStorage.getItem('restaurantCart')) || [];
+        let menuItems = [
+            { id: 1, name: 'شیش کباب', price: 6.99, description: 'ٹینڈر کباب مع سلاد۔', category: 'گِرِل' },
+            { id: 2, name: 'مکسڈ گرل', price: 12.50, description: 'گرلڈ میٹ کا انتخاب۔', category: 'گِرِل' },
+            { id: 3, name: 'چکن ریپ', price: 5.50, description: 'سوس کے ساتھ چکن ریپ۔', category: 'ریپ' },
+            { id: 4, name: 'ویجی ریپ', price: 4.99, description: 'تازہ سبزیاں اور ہمس۔', category: 'ریپ' },
+            { id: 5, name: 'چکن برگر', price: 5.99, description: 'کرسپی چکن برگر مع لیٹس اور سوس۔', category: 'برگر' },
+            { id: 6, name: 'بیف برگر', price: 6.50, description: 'جوسی بیف پیٹی مع چیز۔', category: 'برگر' },
+            { 
+                id: 7, 
+                name: 'فش اینڈ چپس', 
+                description: 'گولڈن فرائیڈ فش، چپس کے سائز کے انتخاب کے ساتھ۔', 
+                category: 'مچھلی',
+                hasOptions: true,
+                options: [
+                    { name: 'ریگولر چپس', price: 7.50 },
+                    { name: 'لارج چپس', price: 9.99 }
+                ]
+            },
+            { id: 8, name: 'مارگریٹا پیزا', price: 8.99, description: 'کلاسک چیز اور ٹماٹر پیزا', category: 'پیزا' },
+            { id: 9, name: 'پیپرونی پیزا', price: 9.50, description: 'اسپائسی پیپرونی اور چیز', category: 'پیزا' },
+            { id: 10, name: 'چکن بریانی', price: 7.99, description: 'خوشبودار چاول اور چکن کا سالن', category: 'ہندوستانی' },
+            { id: 11, name: 'کوڈ (ریگولر)', price: 8.40, description: 'کلاسک کوڈ فش اور چپس', category: 'مچھلی' },
+            // باقی آئٹمز شامل کیے جا سکتے ہیں...
+        ];
+        
+        let currentSelectedItem = null; // ماڈل میں استعمال کے لیے
+        
+        // ******************** رینڈرنگ فنکشنز ********************
+
+        function renderMenu(itemsToRender) {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = ''; // پرانے مینیو کو صاف کریں
+
+            // آئٹمز کو ان کی کیٹیگری کے لحاظ سے گروپ کریں
+            const categorizedItems = itemsToRender.reduce((acc, item) => {
+                acc[item.category] = acc[item.category] || [];
+                acc[item.category].push(item);
+                return acc;
+            }, {});
+
+            for (const category in categorizedItems) {
+                // کیٹیگری کا عنوان بنائیں
+                const title = document.createElement('h2');
+                title.className = 'section-title';
+                title.textContent = ` ${category}`;
+                container.appendChild(title);
+
+                // مینیو گرڈ بنائیں
+                const categoryGrid = document.createElement('div');
+                categoryGrid.className = 'menu-grid';
+
+                categorizedItems[category].forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'menu-item';
+                    
+                    // اگر آپشنز ہوں تو ماڈل دکھائیں، ورنہ براہ راست کارٹ میں شامل کریں
+                    itemElement.onclick = () => item.hasOptions ? showOptionsModal(item) : addToCart(item);
+
+                    itemElement.innerHTML = `
+                        <div class="item-content">
+                            <div class="item-header">
+                                <h3>${item.name}</h3>
+                                <span class="item-price">${item.hasOptions ? 'شروع: ' : ''}£${(item.hasOptions ? item.options[0].price : item.price).toFixed(2)}</span>
+                            </div>
+                            <p class="item-description">${item.description}</p>
+                            <button class="add-to-cart-btn">${item.hasOptions ? 'آپشنز دیکھیں' : 'کارٹ میں شامل کریں'} +</button>
+                        </div>
+                    `;
+                    categoryGrid.appendChild(itemElement);
+                });
+                container.appendChild(categoryGrid);
+            }
+        }
+        
+        function updateCartSummary() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            document.getElementById('cart-item-count').textContent = `${totalItems} آئٹمز`;
+            document.getElementById('cart-total').textContent = `£${totalPrice.toFixed(2)}`;
+            localStorage.setItem('restaurantCart', JSON.stringify(cart));
+        }
+
+        // ******************** کارٹ فنکشنز ********************
+
+        function addToCart(item, selectedOption = null) {
+            let itemToAdd = { ...item }; // آئٹم کی کاپی بنائیں
+
+            if (selectedOption) {
+                // اگر آپشنز منتخب ہو
+                itemToAdd.name = `${item.name} (${selectedOption.name})`;
+                itemToAdd.price = selectedOption.price;
+            }
+
+            // کارٹ میں تلاش کریں
+            const existingItemIndex = cart.findIndex(cartItem => cartItem.name === itemToAdd.name);
+
+            if (existingItemIndex > -1) {
+                cart[existingItemIndex].quantity += 1;
+            } else {
+                cart.push({ ...itemToAdd, quantity: 1 });
+            }
+
+            updateCartSummary();
+            closeModal();
+            alert(`✅ ${itemToAdd.name} کارٹ میں شامل کر دیا گیا ہے۔`);
+        }
+
+        function viewCart() {
+            if (cart.length === 0) {
+                alert("🛒 آپ کا کارٹ خالی ہے!");
+                return;
+            }
+            let cartDetails = "🛒 آپ کا آرڈر:\n\n";
+            cart.forEach(item => {
+                cartDetails += `${item.quantity} x ${item.name} @ £${item.price.toFixed(2)} = £${(item.quantity * item.price).toFixed(2)}\n`;
+            });
+            cartDetails += `\nکل رقم: £${cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}`;
+            alert(cartDetails);
+        }
+
+        // ******************** ماڈل/آپشنز فنکشنز ********************
+
+        function showOptionsModal(item) {
+            currentSelectedItem = item;
+            document.getElementById('modal-item-name').textContent = item.name;
+            const optionsList = document.getElementById('modal-options-list');
+            optionsList.innerHTML = '';
+
+            item.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.innerHTML = `
+                    <label>
+                        <input type="radio" name="item-option" value="${option.name}" ${index === 0 ? 'checked' : ''}>
+                        ${option.name}
+                    </label>
+                    <span style="color: #c0392b;">£${option.price.toFixed(2)}</span>
+                `;
+                optionsList.appendChild(optionDiv);
+            });
+
+            document.getElementById('item-options-modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('item-options-modal').style.display = 'none';
+        }
+
+        // ******************** ایڈمن فنکشنز ********************
+        
+        function openAdminPanel() {
+            document.getElementById('admin-panel').style.display = 'block';
+            // لوکل اسٹوریج سے سیلز اور ڈیلیوری سیٹنگز لوڈ کریں
+            document.getElementById('today-sales-input').value = localStorage.getItem('todaySales') || '0.00';
+            document.getElementById('delivery-charge-input').value = localStorage.getItem('deliveryCharge') || '3.00';
+            document.getElementById('delivery-available-checkbox').checked = localStorage.getItem('deliveryAvailable') === 'true' || true;
+            updateDeliveryStatus();
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('admin-panel').style.display = 'none';
+        }
+
+        function saveSales() {
+            const sales = parseFloat(document.getElementById('today-sales-input').value) || 0;
+            localStorage.setItem('todaySales', sales.toFixed(2));
+            alert(`آج کی سیلز £${sales.toFixed(2)} محفوظ ہو گئی! (صرف براؤزر میں)`);
+        }
+
+        function saveDeliverySettings() {
+            const charge = parseFloat(document.getElementById('delivery-charge-input').value) || 0;
+            const available = document.getElementById('delivery-available-checkbox').checked;
+            
+            localStorage.setItem('deliveryCharge', charge.toFixed(2));
+            localStorage.setItem('deliveryAvailable', available);
+            updateDeliveryStatus();
+            alert(`ڈیلیوری سیٹنگز محفوظ ہو گئیں!`);
+        }
+        
+        function updateDeliveryStatus() {
+            const available = localStorage.getItem('deliveryAvailable') === 'true' || true;
+            const statusElement = document.getElementById('delivery-status');
+            if (available) {
+                statusElement.textContent = `ڈیلیوری اور کلیکشن دستیاب ہے - ڈیلیوری چارج: £${(localStorage.getItem('deliveryCharge') || '3.00')}`;
+            } else {
+                statusElement.textContent = `کلیکشن صرف آج دستیاب ہے`;
+            }
+        }
+        
+        // ******************** ایونٹ ہینڈلرز ********************
+
+        document.getElementById('menu-search').addEventListener('input', function(event) {
+            const query = event.target.value.trim();
+
+            // ایڈمن پینل PIN چیک
+            if (query === '2004') {
+                event.target.value = ''; // ان پٹ صاف کریں
+                openAdminPanel();
+                return;
+            }
+
+            // مینیو سرچ
+            const filteredItems = menuItems.filter(item => 
+                item.name.includes(query) || item.description.includes(query) || item.category.includes(query)
+            );
+            renderMenu(filteredItems);
+        });
+
+        // ******************** پیج لوڈ ہونے پر ********************
+
+        // جب پیج لوڈ ہو تو یہ فنکشنز چلیں گے
+        window.onload = function() {
+            renderMenu(menuItems);
+            updateCartSummary();
+            updateDeliveryStatus();
+        };
+
+    </script>
+    </body>
+</html>
